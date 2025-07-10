@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мой поиск</title>
+  <link rel="icon" href="https://i.postimg.cc/xjsbDSsg/favicon.png" type="image/png">
+  <style>
+    /* Обнуляем отступы */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Фон страницы и общий шрифт */
+   body {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: url('https://i.postimg.cc/g0yMc05f/image.jpg') no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-origin: border-box;
+  color: #fff;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+    h1 {
+      font-size: 2.4rem;
+      margin-bottom: 24px;
+    }
+
+    /* Основной квадрат */
+    #main-square {
+      width: 240px;
+      height: 240px;
+      background: url('https://i.postimg.cc/6tsQShXs/image.png') no-repeat center center;
+      background-size: contain;
+      position: relative;
+      margin-bottom: 40px;
+    }
+
+    #main-square img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60%;
+      height: auto;
+      pointer-events: none;
+    }
+
+    /* Контейнер для селекторов */
+    .selectors {
+      display: flex;
+      gap: 50px;
+      justify-content: center;
+    }
+
+    .selector-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Квадрат селектора */
+    .selector-square {
+      width: 120px;
+      height: 120px;
+      background: url('https://i.postimg.cc/Gd7Tfyqv/image.png') no-repeat center center;
+      background-size: contain;
+      position: relative;
+      cursor: pointer;
+      transition: background-image 0.2s;
+    }
+
+    .selector-square.active {
+      background-image: url('https://i.postimg.cc/hKXQRt56/image.png');
+    }
+
+    .selector-square img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60%;
+      height: auto;
+      pointer-events: none;
+    }
+
+    /* Подписи под квадратиками */
+    .caption {
+      margin-top: 8px;
+      font-size: 1rem;
+      text-align: center;
+    }
+/* Для портретной ориентации (узкие экраны) */
+@media (orientation: portrait) {
+  /* Основной квадрат займёт 80% ширины экрана */
+  #main-square {
+    width: 64vw;
+    height: 64vw;
+    margin-bottom: 30px;
+  }
+
+  /* Селекторы выстраиваются в колонку */
+  .selectors {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Квадраты селекторов — по 60% ширины экрана */
+  .selector-square {
+    width: 48vw;
+    height: 48vw;
+  }
+}
+
+/* Для ландшафтной ориентации (широкие экраны) — уменьшим масштаб чуть-чуть */
+@media (orientation: landscape) {
+  #main-square {
+    width: 32vh;
+    height: 32vh;
+    margin-bottom: 40px;
+  }
+
+  .selectors {
+    flex-direction: row;
+    gap: 40px;
+  }
+
+  .selector-square {
+    width: 16vh;
+    height: 16vh;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <h1>Хобби</h1>
+
+  <div id="main-square"></div>
+
+  <div class="selectors">
+    <div class="selector-wrapper">
+      <div class="selector-square" data-index="0">
+        <img src="https://i.postimg.cc/dwxcpsdh/1.png" alt="Игры">
+      </div>
+      <div class="caption">Игры</div>
+    </div>
+    <div class="selector-wrapper">
+      <div class="selector-square" data-index="1">
+        <img src="https://i.postimg.cc/WT3P5FDR/2.png" alt="Еда">
+      </div>
+      <div class="caption">Еда</div>
+    </div>
+    <div class="selector-wrapper">
+      <div class="selector-square" data-index="2">
+        <img src="https://i.postimg.cc/k4Bn3LYR/3.png" alt="Музыка">
+      </div>
+      <div class="caption">Музыка</div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const selectors = document.querySelectorAll('.selector-square');
+      const mainSquare = document.getElementById('main-square');
+
+      const selectSound = new Audio('https://github.com/VladDeploy/Meets/raw/refs/heads/main/Choice.mp3');
+      const cancelSound = new Audio('https://github.com/VladDeploy/Meets/raw/refs/heads/main/Cancel%20choice.mp3');
+
+      let currentSelected = null;
+
+      selectors.forEach(selector => {
+  selector.addEventListener('click', () => {
+    // Если кликаем по уже выбранному — отменяем выбор
+    if (currentSelected === selector) {
+      selector.classList.remove('active');
+      mainSquare.innerHTML = '';
+      cancelSound.play();
+      currentSelected = null;
+      return;
+    }
+
+    // Новый выбор: прерываем любой текущий selectSound
+    selectSound.pause();
+    selectSound.currentTime = 0;
+    selectSound.play();
+
+    // Снимаем активный у предыдущего (если был)
+    if (currentSelected) {
+      currentSelected.classList.remove('active');
+    }
+
+    // Делаем активным новый
+    selector.classList.add('active');
+    currentSelected = selector;
+
+    // Обновляем содержимое главного квадрата
+    mainSquare.innerHTML = '';
+    const icon = selector.querySelector('img').cloneNode();
+    mainSquare.appendChild(icon);
+  });
+});
+    });
+  </script>
+
+</body>
+</html>
